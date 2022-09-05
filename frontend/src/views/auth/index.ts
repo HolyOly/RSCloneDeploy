@@ -11,6 +11,8 @@ class AuthWindow extends View {
   initAuthWindow():void {
     const btnAuth = this.getElementById('auth-user') as HTMLButtonElement;
     const skipAuth = this.getElementById('auth-skip') as HTMLParagraphElement;
+    const checkBox = this.getElementById('togglePassVisibility') as HTMLInputElement;
+    checkBox.addEventListener('input', () => this.togglePassVisibility(checkBox));
     skipAuth.addEventListener('click', () => this.initStartButton());
     btnAuth.addEventListener('click', (e: Event) => {
       e.preventDefault();
@@ -32,10 +34,20 @@ class AuthWindow extends View {
   makeUserData(suffix: string):UserData {
     const nameEl = this.getElementById(`name-${suffix}`) as HTMLInputElement;
     const passEl = this.getElementById(`pass-${suffix}`) as HTMLInputElement;
+    localStorage.setItem('username', nameEl.value.trim());
     return {
       name: nameEl.value.trim(),
       password: passEl.value.trim(),
     };
+  }
+
+  togglePassVisibility(inputEl: HTMLInputElement) {
+    const pass = this.getElementById('pass-auth') as HTMLInputElement;
+    if (inputEl.checked === true) {
+      pass.type = 'text';
+    } else {
+      pass.type = 'password';
+    }
   }
 
   hiddenContent(id: string) {

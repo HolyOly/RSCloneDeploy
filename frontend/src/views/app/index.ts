@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 /* eslint-disable max-len */
 import template from './index.html';
 import style from './app.scss';
@@ -17,7 +16,7 @@ import StartPageView from '../startPage';
 import ControlsView from '../settingControl/ControlsView';
 import SettingSound from '../settingSound';
 
-enum ViewId { startPage, canvas, placaholder, sounds, settingGame, settingControl, settingSound }
+enum ViewId { startPage, canvas, placeholder, sounds, settingGame, settingControl, settingSound }
 
 class AppPage extends View implements IGameCallbacks {
   private static contentId = style.content;
@@ -40,7 +39,7 @@ class AppPage extends View implements IGameCallbacks {
         return canvasView;
       }
 
-      case ViewId.placaholder: return new BoardersView(AppPage.contentId, this.services.api.times);
+      case ViewId.placeholder: return new BoardersView(AppPage.contentId, this.services.api);
       case ViewId.sounds: return new SoundView('sounds', this.services.sounds.subsribe);
       case ViewId.settingGame:
         return new SettingIsGame(AppPage.contentId, this.services.gameSettings);
@@ -67,7 +66,7 @@ class AppPage extends View implements IGameCallbacks {
   private initListeners() {
     this.getElementById('toMainPage')?.addEventListener('click', this.changeTo.bind(this, ViewId.startPage));
     this.getElementById('toCanvas')?.addEventListener('click', this.changeTo.bind(this, ViewId.canvas));
-    this.getElementById('toPlaceholder')?.addEventListener('click', this.changeTo.bind(this, ViewId.placaholder));
+    this.getElementById('toPlaceholder')?.addEventListener('click', this.changeTo.bind(this, ViewId.placeholder));
     this.getElementById('toSettingGame')?.addEventListener('click', this.changeTo.bind(this, ViewId.settingGame));
     this.getElementById('toSettingControl')?.addEventListener('click', this.changeTo.bind(this, ViewId.settingControl));
     this.getElementById('settingSound')?.addEventListener('click', this.changeTo.bind(this, ViewId.settingSound));
@@ -88,15 +87,11 @@ class AppPage extends View implements IGameCallbacks {
     return true;
   }
 
-  public changeToGamePage(): boolean {
-    if (this.currentViewId === ViewId.startPage) return false;
-    this.changeTo(ViewId.startPage);
-    return true;
-  }
-
   public winTheGame(win:WinTheGame):void {
     alert(JSON.stringify(win));
     console.log(this);
+    new BoardersView(AppPage.contentId, this.services.api).postTimeData(+win.elapsedSeconds.toFixed(3));
+    new BoardersView(AppPage.contentId, this.services.api).postWinData();
   }
 
   public pauseTheGame():void {
